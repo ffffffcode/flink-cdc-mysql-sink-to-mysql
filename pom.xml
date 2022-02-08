@@ -11,6 +11,7 @@
     <properties>
         <flink.version>1.13.5</flink.version>
         <flink.cdc.version>2.1.1</flink.cdc.version>
+        <clickhouse4j.version>1.4.4</clickhouse4j.version>
         <jackson.version>2.11.1</jackson.version>
         <fastjson.version>1.2.75</fastjson.version>
         <maven.compiler.source>8</maven.compiler.source>
@@ -62,9 +63,9 @@
         </dependency>
 
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.21</version>
+            <groupId>cc.blynk.clickhouse</groupId>
+            <artifactId>clickhouse4j</artifactId>
+            <version>${clickhouse4j.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -124,7 +125,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.boom.stream.demo.MySqlBinlogSourceDeserializerAndJdbcSinkExample</mainClass>
+                                    <mainClass>com.boom.stream.demo.MySqlBinlogSourceDeserializerAndClickHouseSinkExample</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

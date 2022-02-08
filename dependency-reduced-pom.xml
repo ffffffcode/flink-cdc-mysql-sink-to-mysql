@@ -35,7 +35,7 @@
               </filters>
               <transformers>
                 <transformer>
-                  <mainClass>com.boom.stream.demo.MySqlBinlogSourceDeserializerAndJdbcSinkExample</mainClass>
+                  <mainClass>com.boom.stream.demo.MySqlBinlogSourceDeserializerAndClickHouseSinkExample</mainClass>
                 </transformer>
               </transformers>
             </configuration>
