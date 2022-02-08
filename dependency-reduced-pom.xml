@@ -46,26 +46,40 @@
   </build>
   <dependencies>
     <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-connector-jdbc_2.11</artifactId>
+      <version>1.13.5</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ververica</groupId>
+      <artifactId>flink-connector-mysql-cdc</artifactId>
+      <version>2.1.1</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>flink-connector-debezium</artifactId>
+          <groupId>com.ververica</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>debezium-connector-mysql</artifactId>
+          <groupId>io.debezium</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>esri-geometry-api</artifactId>
+          <groupId>com.esri.geometry</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>HikariCP</artifactId>
+          <groupId>com.zaxxer</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>1.18.2</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.flink</groupId>
-      <artifactId>flink-table-api-java-bridge_2.11</artifactId>
-      <version>1.13.5</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>flink-table-api-java</artifactId>
-          <groupId>org.apache.flink</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>flink-streaming-java_2.11</artifactId>
-          <groupId>org.apache.flink</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
   <properties>
