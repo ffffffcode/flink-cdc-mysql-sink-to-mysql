@@ -51,7 +51,7 @@ public class MySqlBinlogSourceDeserializerAndJdbcSinkExample {
 
         env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "MySQL bm_order Source")
                 // set 2 parallel source tasks
-                .setParallelism(2)
+                .setParallelism(4)
                 .addSink(JdbcSink.sink(
                         "INSERT INTO mall_statistics.user_behavior_flink_cdc (tenant_id, area_id, member_id, event_time, behavior_type) VALUES (?, ?, ?, ?, ?)",
                         (ps, t) -> {
@@ -70,7 +70,7 @@ public class MySqlBinlogSourceDeserializerAndJdbcSinkExample {
                 .name("MySQL user_behavior_flink_cdc Sink")
                 .setParallelism(2);
 
-        env.execute("Print MySQL Snapshot + Binlog (Test 2 JDBC Sink)");
+        env.execute("Sink UserBehavior");
     }
 
     private static class UserBehaviorDebeziumDeserializer implements DebeziumDeserializationSchema<UserBehavior> {
