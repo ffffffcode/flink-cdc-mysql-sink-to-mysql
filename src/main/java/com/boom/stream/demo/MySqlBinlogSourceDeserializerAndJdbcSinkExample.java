@@ -5,7 +5,6 @@ import com.boom.stream.order.entity.UserBehavior;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
@@ -51,8 +50,8 @@ public class MySqlBinlogSourceDeserializerAndJdbcSinkExample {
         env.enableCheckpointing(3000L);
 
         env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "MySQL bm_order Source")
-                // set 4 parallel source tasks
-                .setParallelism(4)
+                // set 2 parallel source tasks
+                .setParallelism(2)
                 .addSink(JdbcSink.sink(
                         "INSERT INTO mall_statistics.user_behavior_flink_cdc (tenant_id, area_id, member_id, event_time, behavior_type) VALUES (?, ?, ?, ?, ?)",
                         (ps, t) -> {
@@ -69,9 +68,9 @@ public class MySqlBinlogSourceDeserializerAndJdbcSinkExample {
                                 .withDriverName("com.mysql.cj.jdbc.Driver")
                                 .build()))
                 .name("MySQL user_behavior_flink_cdc Sink")
-                .setParallelism(1);
+                .setParallelism(2);
 
-        env.execute("Print MySQL Snapshot + Binlog (Test JDBC Sink)");
+        env.execute("Print MySQL Snapshot + Binlog (Test 2 JDBC Sink)");
     }
 
     private static class UserBehaviorDebeziumDeserializer implements DebeziumDeserializationSchema<UserBehavior> {
@@ -79,7 +78,7 @@ public class MySqlBinlogSourceDeserializerAndJdbcSinkExample {
         private transient JsonConverter jsonConverter;
 
         @Override
-        public void deserialize(SourceRecord record, Collector<UserBehavior> out) throws Exception {
+        public void deserialize(SourceRecord record, Collector<UserBehavior> out) {
             if (jsonConverter == null) {
                 // initialize jsonConverter
                 jsonConverter = new JsonConverter();
@@ -103,6 +102,7 @@ public class MySqlBinlogSourceDeserializerAndJdbcSinkExample {
                 userBehavior.setEventTime(Instant.ofEpochMilli(source.getLong("ts_ms")));
                 userBehavior.setBehaviorType(1);
                 out.collect(userBehavior);
+                return;
             }
             // TODO logic delete
             if ("u".equals(binlog.getString("op"))) {
@@ -113,6 +113,7 @@ public class MySqlBinlogSourceDeserializerAndJdbcSinkExample {
                 userBehavior.setEventTime(Instant.ofEpochMilli(source.getLong("ts_ms")));
                 userBehavior.setBehaviorType(2);
                 out.collect(userBehavior);
+                return;
             }
             if ("d".equals(binlog.getString("op"))) {
                 JSONObject before = binlog.getJSONObject("before");
@@ -123,6 +124,7 @@ public class MySqlBinlogSourceDeserializerAndJdbcSinkExample {
                 userBehavior.setEventTime(Instant.ofEpochMilli(source.getLong("ts_ms")));
                 userBehavior.setBehaviorType(3);
                 out.collect(userBehavior);
+                return;
             }
         }
 
