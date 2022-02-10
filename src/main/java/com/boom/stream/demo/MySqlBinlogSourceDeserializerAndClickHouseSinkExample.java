@@ -1,7 +1,7 @@
 package com.boom.stream.demo;
 
 import com.alibaba.fastjson.JSONObject;
-import com.boom.stream.order.entity.UserBehavior;
+import com.boom.stream.demo.entity.UserBehavior;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;

@@ -3,7 +3,7 @@ package com.boom.stream.order;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.boom.stream.order.entity.BmOrder;
-import com.boom.stream.order.entity.UserBehavior;
+import com.boom.stream.demo.entity.UserBehavior;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.configuration.Configuration;

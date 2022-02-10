@@ -2,13 +2,12 @@ package com.boom.stream.order;
 
 import com.alibaba.fastjson.JSONObject;
 import com.boom.stream.order.entity.BmOrder;
-import com.boom.stream.order.entity.UserBehavior;
+import com.boom.stream.demo.entity.UserBehavior;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 

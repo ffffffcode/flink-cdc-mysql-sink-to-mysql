@@ -1,4 +1,4 @@
-package com.boom.stream.order.entity;
+package com.boom.stream.demo.entity;
 
 import lombok.Data;
 
@@ -17,6 +17,7 @@ public class UserBehavior {
     private Long memberId;
     private Instant eventTime;
     private Integer behaviorType;
+    private String behaviorName;
 
     private Integer tenantId;
     private Integer areaId;

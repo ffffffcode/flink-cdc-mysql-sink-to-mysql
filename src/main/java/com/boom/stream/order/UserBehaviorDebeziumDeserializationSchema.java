@@ -2,9 +2,8 @@ package com.boom.stream.order;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.boom.stream.order.DataChangeEvents;
 import com.boom.stream.order.entity.BmOrder;
-import com.boom.stream.order.entity.UserBehavior;
+import com.boom.stream.demo.entity.UserBehavior;
 import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;

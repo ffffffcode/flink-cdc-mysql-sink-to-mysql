@@ -1,21 +1,15 @@
 package com.boom.stream.demo;
 
 import com.alibaba.fastjson.JSONObject;
-import com.boom.stream.order.entity.UserBehavior;
+import com.boom.stream.demo.entity.UserBehavior;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
