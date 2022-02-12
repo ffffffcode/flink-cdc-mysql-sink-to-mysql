@@ -1,23 +1,12 @@
 package com.boom.stream.demo.job;
 
-import com.alibaba.fastjson.JSONObject;
 import com.boom.stream.demo.deserializer.UserBehaviorDebeziumDeserializer;
 import com.boom.stream.demo.entity.UserBehavior;
-import com.boom.stream.demo.enums.OrderStatusEnum;
-import com.boom.stream.demo.enums.UserBehaviorEnum;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.functions.RichFlatMapFunction;
-import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.api.common.state.ValueState;
-import org.apache.flink.api.common.state.ValueStateDescriptor;
-import org.apache.flink.api.common.typeinfo.Types;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.ProcessFunction;
-import org.apache.flink.util.Collector;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -53,7 +42,7 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
             env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order MySQL Binlog Source")
                     .setParallelism(4)
                     .addSink(JdbcSink.sink(
-                            "INSERT INTO analyse.user_behavior_flink_cdc (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name) VALUES (?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO analyse.user_behavior_flink_cdc (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
                             (ps, t) -> {
                                 ps.setInt(1, t.getTenantId());
                                 ps.setInt(2, t.getAreaId());
@@ -61,6 +50,7 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
                                 ps.setString(4, t.getEventTime().atZone(ZoneId.of("+8")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                                 ps.setInt(5, t.getBehaviorType());
                                 ps.setString(6, t.getBehaviorName());
+                                ps.setLong(7, t.getSourceId());
                             },
                             new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
                                     .withUrl("jdbc:clickhouse://10.0.10.13:25202/analyse?useUnicode=true&characterEncoding=UTF-8&useSSL=false&use_time_zone=UTC+8&use_server_time_zone=UTC+8")

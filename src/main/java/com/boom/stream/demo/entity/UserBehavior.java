@@ -12,7 +12,7 @@ import java.time.Instant;
 @Data
 public class UserBehavior {
 
-    private Long id;
+    private Long sourceId;
 
     private Long memberId;
     private Instant eventTime;

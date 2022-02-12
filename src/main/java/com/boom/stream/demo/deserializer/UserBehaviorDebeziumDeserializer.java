@@ -39,6 +39,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
             String binlogString = new String(bytes);
             JSONObject binlog = JSONObject.parseObject(binlogString);
             JSONObject after = binlog.getJSONObject("after");
+
             if ("r".equals(binlog.getString("op"))) {
                 Integer orderStatus = after.getInteger("order_status");
                 OrderStatusEnum orderStatusEnum = OrderStatusEnum.getEnumByCode(orderStatus);
@@ -46,91 +47,8 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                     throw new RuntimeException("订单转换为行为记录失败，订单状态（order_status）错误，binlog：" + binlogString);
                 }
 
-                if (OrderStatusEnum.WAIT_PAY.equals(orderStatusEnum) || OrderStatusEnum.CLOSED.equals(orderStatusEnum)) {
-                    UserBehavior userOrderBehavior = new UserBehavior();
-                    userOrderBehavior.setId(after.getLong("id"));
-                    userOrderBehavior.setTenantId(after.getInteger("tenant_id"));
-                    userOrderBehavior.setAreaId(after.getInteger("area_id"));
-                    userOrderBehavior.setMemberId(after.getLong("member_id"));
-                    userOrderBehavior.setEventTime(after.getDate("order_time").toInstant());
-                    userOrderBehavior.setBehaviorType(UserBehaviorEnum.ORDER.getType());
-                    userOrderBehavior.setBehaviorName(UserBehaviorEnum.ORDER.getName());
-                    out.collect(userOrderBehavior);
-                }
-                if (OrderStatusEnum.WAIT_CHECK.equals(orderStatusEnum) || OrderStatusEnum.EXPIRED.equals(orderStatusEnum)) {
-                    UserBehavior userOrderBehavior = new UserBehavior();
-                    userOrderBehavior.setId(after.getLong("id"));
-                    userOrderBehavior.setTenantId(after.getInteger("tenant_id"));
-                    userOrderBehavior.setAreaId(after.getInteger("area_id"));
-                    userOrderBehavior.setMemberId(after.getLong("member_id"));
-                    userOrderBehavior.setEventTime(after.getDate("order_time").toInstant());
-                    userOrderBehavior.setBehaviorType(UserBehaviorEnum.ORDER.getType());
-                    userOrderBehavior.setBehaviorName(UserBehaviorEnum.ORDER.getName());
-                    out.collect(userOrderBehavior);
-
-                    UserBehavior userPayBehavior = new UserBehavior();
-                    userPayBehavior.setId(after.getLong("id"));
-                    userPayBehavior.setTenantId(after.getInteger("tenant_id"));
-                    userPayBehavior.setAreaId(after.getInteger("area_id"));
-                    userPayBehavior.setMemberId(after.getLong("member_id"));
-                    userPayBehavior.setBehaviorType(UserBehaviorEnum.PAY.getType());
-                    userPayBehavior.setBehaviorName(UserBehaviorEnum.PAY.getName());
-                    Date payTime = after.getDate("pay_time");
-                    if (payTime == null) {
-                        return;
-                    }
-                        userPayBehavior.setEventTime(payTime.toInstant());
-                    out.collect(userPayBehavior);
-                }
-                if (OrderStatusEnum.ALREADY_CHECK.equals(orderStatusEnum)) {
-                    UserBehavior userOrderBehavior = new UserBehavior();
-                    userOrderBehavior.setId(after.getLong("id"));
-                    userOrderBehavior.setTenantId(after.getInteger("tenant_id"));
-                    userOrderBehavior.setAreaId(after.getInteger("area_id"));
-                    userOrderBehavior.setMemberId(after.getLong("member_id"));
-                    userOrderBehavior.setEventTime(after.getDate("order_time").toInstant());
-                    userOrderBehavior.setBehaviorType(UserBehaviorEnum.ORDER.getType());
-                    userOrderBehavior.setBehaviorName(UserBehaviorEnum.ORDER.getName());
-                    out.collect(userOrderBehavior);
-
-                    UserBehavior userPayBehavior = new UserBehavior();
-                    userPayBehavior.setId(after.getLong("id"));
-                    userPayBehavior.setTenantId(after.getInteger("tenant_id"));
-                    userPayBehavior.setAreaId(after.getInteger("area_id"));
-                    userPayBehavior.setMemberId(after.getLong("member_id"));
-                    userPayBehavior.setBehaviorType(UserBehaviorEnum.PAY.getType());
-                    userPayBehavior.setBehaviorName(UserBehaviorEnum.PAY.getName());
-                    Date payTime = after.getDate("pay_time");
-                    if (payTime == null) {
-                        return;
-                    }
-                        userPayBehavior.setEventTime(payTime.toInstant());
-                    out.collect(userPayBehavior);
-
-                    UserBehavior userUseBehavior = new UserBehavior();
-                    userUseBehavior.setId(after.getLong("id"));
-                    userUseBehavior.setTenantId(after.getInteger("tenant_id"));
-                    userUseBehavior.setAreaId(after.getInteger("area_id"));
-                    userUseBehavior.setMemberId(after.getLong("member_id"));
-                    userUseBehavior.setBehaviorType(UserBehaviorEnum.USE.getType());
-                    userUseBehavior.setBehaviorName(UserBehaviorEnum.USE.getName());
-                    userUseBehavior.setEventTime(after.getDate("update_time").toInstant());
-                    out.collect(userUseBehavior);
-                }
-            }
-        } catch (Exception e) {
-            throw e;
-        }
-
-
-           /* if ("r".equals(binlog.getString("op"))) {
-                Integer orderStatus = after.getInteger("order_status");
-                OrderStatusEnum orderStatusEnum = OrderStatusEnum.getEnumByCode(orderStatus);
-                if (orderStatusEnum == null) {
-                    throw new RuntimeException("订单转换为行为记录失败，订单状态（order_status）错误，binlog：" + binlogString);
-                }
-
                 UserBehavior userOrderBehavior = new UserBehavior();
+                userOrderBehavior.setSourceId(after.getLong("id"));
                 userOrderBehavior.setTenantId(after.getInteger("tenant_id"));
                 userOrderBehavior.setAreaId(after.getInteger("area_id"));
                 userOrderBehavior.setMemberId(after.getLong("member_id"));
@@ -139,44 +57,60 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                 userOrderBehavior.setBehaviorName(UserBehaviorEnum.ORDER.getName());
 
                 UserBehavior userPayBehavior = new UserBehavior();
+                userPayBehavior.setSourceId(after.getLong("id"));
                 userPayBehavior.setTenantId(after.getInteger("tenant_id"));
                 userPayBehavior.setAreaId(after.getInteger("area_id"));
                 userPayBehavior.setMemberId(after.getLong("member_id"));
                 userPayBehavior.setBehaviorType(UserBehaviorEnum.PAY.getType());
                 userPayBehavior.setBehaviorName(UserBehaviorEnum.PAY.getName());
 
-
                 UserBehavior userUseBehavior = new UserBehavior();
+                userUseBehavior.setSourceId(after.getLong("id"));
                 userUseBehavior.setTenantId(after.getInteger("tenant_id"));
                 userUseBehavior.setAreaId(after.getInteger("area_id"));
                 userUseBehavior.setMemberId(after.getLong("member_id"));
                 userUseBehavior.setBehaviorType(UserBehaviorEnum.USE.getType());
                 userUseBehavior.setBehaviorName(UserBehaviorEnum.USE.getName());
 
+                Date payTime = after.getDate("pay_time");
+                Date updateTime = after.getDate("update_time");
+
                 switch (orderStatusEnum) {
                     case WAIT_PAY:
                         out.collect(userOrderBehavior);
-                        return;
+                        break;
                     case WAIT_CHECK:
-//                        out.collect(userOrderBehavior);
-                        userPayBehavior.setEventTime(after.getDate("pay_time").toInstant());
+                        out.collect(userOrderBehavior);
+                        if (payTime == null) {
+                            return;
+                        }
+                        userPayBehavior.setEventTime(payTime.toInstant());
                         out.collect(userPayBehavior);
-                        return;
+                        break;
                     case ALREADY_CHECK:
-//                        out.collect(userOrderBehavior);
-                        userPayBehavior.setEventTime(after.getDate("pay_time").toInstant());
-//                        out.collect(userPayBehavior);
-                        userUseBehavior.setEventTime(after.getDate("update_time").toInstant());
-                        out.collect(userUseBehavior);
-                        return;
-                    case EXPIRED:
-//                        out.collect(userOrderBehavior);
-                        userPayBehavior.setEventTime(after.getDate("pay_time").toInstant());
+                        out.collect(userOrderBehavior);
+                        if (payTime == null) {
+                            return;
+                        }
+                        userPayBehavior.setEventTime(payTime.toInstant());
                         out.collect(userPayBehavior);
-                        return;
+                        if (updateTime == null) {
+                            return;
+                        }
+                        userUseBehavior.setEventTime(updateTime.toInstant());
+                        out.collect(userUseBehavior);
+                        break;
+                    case EXPIRED:
+                        out.collect(userOrderBehavior);
+                        if (payTime == null) {
+                            return;
+                        }
+                        userPayBehavior.setEventTime(payTime.toInstant());
+                        out.collect(userPayBehavior);
+                        break;
                     case CLOSED:
                         out.collect(userOrderBehavior);
-                        return;
+                        break;
                     default:
                         throw new RuntimeException("订单转换为行为记录失败，binlog：" + binlogString);
                 }
@@ -184,6 +118,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
 
             if ("c".equals(binlog.getString("op"))) {
                 UserBehavior userOrderBehavior = new UserBehavior();
+                userOrderBehavior.setSourceId(after.getLong("id"));
                 userOrderBehavior.setTenantId(after.getInteger("tenant_id"));
                 userOrderBehavior.setAreaId(after.getInteger("area_id"));
                 userOrderBehavior.setMemberId(after.getLong("member_id"));
@@ -204,28 +139,42 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                 switch (orderStatusEnum) {
                     case WAIT_CHECK:
                         UserBehavior userPayBehavior = new UserBehavior();
+                        userPayBehavior.setSourceId(after.getLong("id"));
                         userPayBehavior.setTenantId(after.getInteger("tenant_id"));
                         userPayBehavior.setAreaId(after.getInteger("area_id"));
                         userPayBehavior.setMemberId(after.getLong("member_id"));
-                        userPayBehavior.setEventTime(after.getDate("pay_time").toInstant());
+                        Date payTime = after.getDate("pay_time");
+                        if (payTime == null) {
+                            return;
+                        }
+                        userPayBehavior.setEventTime(payTime.toInstant());
                         userPayBehavior.setBehaviorType(UserBehaviorEnum.PAY.getType());
                         userPayBehavior.setBehaviorName(UserBehaviorEnum.PAY.getName());
                         out.collect(userPayBehavior);
-                        return;
+                        break;
                     case ALREADY_CHECK:
                         UserBehavior userUseBehavior = new UserBehavior();
+                        userUseBehavior.setSourceId(after.getLong("id"));
                         userUseBehavior.setTenantId(after.getInteger("tenant_id"));
                         userUseBehavior.setAreaId(after.getInteger("area_id"));
                         userUseBehavior.setMemberId(after.getLong("member_id"));
-                        userUseBehavior.setEventTime(after.getDate("update_time").toInstant());
+                        Date updateTime = after.getDate("update_time");
+                        if (updateTime == null) {
+                            return;
+                        }
+                        userUseBehavior.setEventTime(updateTime.toInstant());
                         userUseBehavior.setBehaviorType(UserBehaviorEnum.USE.getType());
                         userUseBehavior.setBehaviorName(UserBehaviorEnum.USE.getName());
                         out.collect(userUseBehavior);
-                        return;
+                        break;
                     default:
                         throw new RuntimeException("订单转换为行为记录失败，binlog：" + binlogString);
                 }
-            }*/
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+
     }
 
     @Override
