@@ -40,7 +40,7 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
             env.enableCheckpointing(3000L);
 
             env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order MySQL Binlog Source")
-                    .setParallelism(4)
+                    .setParallelism(1)
                     .addSink(JdbcSink.sink(
                             "INSERT INTO analyse.user_behavior_flink_cdc (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
                             (ps, t) -> {
