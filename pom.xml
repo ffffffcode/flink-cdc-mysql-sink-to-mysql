@@ -125,7 +125,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.boom.stream.demo.MySqlBinlogSourceDeserializerAndClickHouseSinkExample</mainClass>
+                                    <mainClass>com.boom.stream.demo.job.OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
