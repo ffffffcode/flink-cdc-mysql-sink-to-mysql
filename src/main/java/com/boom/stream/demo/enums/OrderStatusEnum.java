@@ -3,12 +3,6 @@ package com.boom.stream.demo.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * 订单状态 枚举
- *
- * @Author: lizhongbao
- * @Date: 2020/10/27 15:24
- */
 @AllArgsConstructor
 @Getter
 public enum OrderStatusEnum {

@@ -1,8 +1,10 @@
 package com.boom.stream.demo.deserializer;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boom.stream.demo.entity.UserBehavior;
 import com.boom.stream.demo.enums.OrderStatusEnum;
+import com.boom.stream.demo.enums.RefundStatusEnum;
 import com.boom.stream.demo.enums.UserBehaviorEnum;
 import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
@@ -38,6 +40,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                     jsonConverter.fromConnectData(record.topic(), record.valueSchema(), record.value());
             String binlogString = new String(bytes);
             JSONObject binlog = JSONObject.parseObject(binlogString);
+            JSONObject before = binlog.getJSONObject("before");
             JSONObject after = binlog.getJSONObject("after");
 
             if ("r".equals(binlog.getString("op"))) {
@@ -82,7 +85,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                     case WAIT_CHECK:
                         out.collect(userOrderBehavior);
                         if (payTime == null) {
-                            return;
+                            break;
                         }
                         userPayBehavior.setEventTime(payTime.toInstant());
                         out.collect(userPayBehavior);
@@ -90,12 +93,12 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                     case ALREADY_CHECK:
                         out.collect(userOrderBehavior);
                         if (payTime == null) {
-                            return;
+                            break;
                         }
                         userPayBehavior.setEventTime(payTime.toInstant());
                         out.collect(userPayBehavior);
                         if (updateTime == null) {
-                            return;
+                            break;
                         }
                         userUseBehavior.setEventTime(updateTime.toInstant());
                         out.collect(userUseBehavior);
@@ -103,7 +106,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                     case EXPIRED:
                         out.collect(userOrderBehavior);
                         if (payTime == null) {
-                            return;
+                            break;
                         }
                         userPayBehavior.setEventTime(payTime.toInstant());
                         out.collect(userPayBehavior);
@@ -114,6 +117,30 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                     default:
                         throw new RuntimeException("订单转换为行为记录失败，binlog：" + binlogString);
                 }
+
+
+                Integer refundStatus = after.getInteger("refund_status");
+                RefundStatusEnum refundStatusEnum = RefundStatusEnum.getEnumByCode(refundStatus);
+                if (refundStatusEnum == null) {
+                    throw new RuntimeException("订单转换为行为记录失败，退款状态（refund_status）错误，binlog：" + binlogString);
+                }
+
+                if (!refundStatusEnum.equals(RefundStatusEnum.NOT_ALL_REFUNDED)) {
+                    UserBehavior userRefundBehavior = new UserBehavior();
+                    userRefundBehavior.setSourceId(after.getLong("id"));
+                    userRefundBehavior.setTenantId(after.getInteger("tenant_id"));
+                    userRefundBehavior.setAreaId(after.getInteger("area_id"));
+                    userRefundBehavior.setMemberId(after.getLong("member_id"));
+                    Date refundTime = after.getDate("update_time");
+                    if (refundTime == null) {
+                        return;
+                    }
+                    userRefundBehavior.setEventTime(refundTime.toInstant());
+                    userRefundBehavior.setBehaviorType(UserBehaviorEnum.REFUND.getType());
+                    userRefundBehavior.setBehaviorName(UserBehaviorEnum.REFUND.getName());
+                    out.collect(userRefundBehavior);
+                }
+                return;
             }
 
             if ("c".equals(binlog.getString("op"))) {
@@ -130,51 +157,87 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
             }
 
             if ("u".equals(binlog.getString("op"))) {
-                Integer orderStatus = after.getInteger("order_status");
-                OrderStatusEnum orderStatusEnum = OrderStatusEnum.getEnumByCode(orderStatus);
-                if (orderStatusEnum == null) {
-                    throw new RuntimeException("订单转换为行为记录失败，订单状态（order_status）错误，binlog：" + binlogString);
+                Integer beforeOrderStatus = before.getInteger("order_status");
+                Integer afterOrderStatus = after.getInteger("order_status");
+                if (!beforeOrderStatus.equals(afterOrderStatus)) {
+                    OrderStatusEnum orderStatusEnum = OrderStatusEnum.getEnumByCode(afterOrderStatus);
+                    if (orderStatusEnum == null) {
+                        throw new RuntimeException("订单转换为行为记录失败，订单状态（order_status）错误，binlog：" + binlogString);
+                    }
+                    recordOrder(orderStatusEnum, after, out);
+                    return;
                 }
 
-                switch (orderStatusEnum) {
-                    case WAIT_CHECK:
-                        UserBehavior userPayBehavior = new UserBehavior();
-                        userPayBehavior.setSourceId(after.getLong("id"));
-                        userPayBehavior.setTenantId(after.getInteger("tenant_id"));
-                        userPayBehavior.setAreaId(after.getInteger("area_id"));
-                        userPayBehavior.setMemberId(after.getLong("member_id"));
-                        Date payTime = after.getDate("pay_time");
-                        if (payTime == null) {
-                            return;
-                        }
-                        userPayBehavior.setEventTime(payTime.toInstant());
-                        userPayBehavior.setBehaviorType(UserBehaviorEnum.PAY.getType());
-                        userPayBehavior.setBehaviorName(UserBehaviorEnum.PAY.getName());
-                        out.collect(userPayBehavior);
-                        break;
-                    case ALREADY_CHECK:
-                        UserBehavior userUseBehavior = new UserBehavior();
-                        userUseBehavior.setSourceId(after.getLong("id"));
-                        userUseBehavior.setTenantId(after.getInteger("tenant_id"));
-                        userUseBehavior.setAreaId(after.getInteger("area_id"));
-                        userUseBehavior.setMemberId(after.getLong("member_id"));
-                        Date updateTime = after.getDate("update_time");
-                        if (updateTime == null) {
-                            return;
-                        }
-                        userUseBehavior.setEventTime(updateTime.toInstant());
-                        userUseBehavior.setBehaviorType(UserBehaviorEnum.USE.getType());
-                        userUseBehavior.setBehaviorName(UserBehaviorEnum.USE.getName());
-                        out.collect(userUseBehavior);
-                        break;
-                    default:
-                        throw new RuntimeException("订单转换为行为记录失败，binlog：" + binlogString);
+                Integer beforeRefundStatus = before.getInteger("refund_status");
+                Integer afterRefundStatus = after.getInteger("refund_status");
+                if (!beforeRefundStatus.equals(afterRefundStatus)) {
+                    RefundStatusEnum refundStatusEnum = RefundStatusEnum.getEnumByCode(afterRefundStatus);
+                    if (refundStatusEnum == null) {
+                        throw new RuntimeException("订单转换为行为记录失败，退款状态（refund_status）错误，binlog：" + binlogString);
+                    }
+                    recordRefund(refundStatusEnum, after, out);
                 }
             }
+
         } catch (Exception e) {
             throw e;
         }
 
+    }
+
+    private void recordRefund(RefundStatusEnum refundStatusEnum, JSONObject after, Collector<UserBehavior> out) {
+        if (refundStatusEnum.equals(RefundStatusEnum.ALL_APPLY_REFUND)) {
+            UserBehavior userPayBehavior = new UserBehavior();
+            userPayBehavior.setSourceId(after.getLong("id"));
+            userPayBehavior.setTenantId(after.getInteger("tenant_id"));
+            userPayBehavior.setAreaId(after.getInteger("area_id"));
+            userPayBehavior.setMemberId(after.getLong("member_id"));
+            Date refundTime = after.getDate("update_time");
+            if (refundTime == null) {
+                return;
+            }
+            userPayBehavior.setEventTime(refundTime.toInstant());
+            userPayBehavior.setBehaviorType(UserBehaviorEnum.REFUND.getType());
+            userPayBehavior.setBehaviorName(UserBehaviorEnum.REFUND.getName());
+            out.collect(userPayBehavior);
+        }
+    }
+
+    private void recordOrder(OrderStatusEnum orderStatusEnum, JSONObject after, Collector<UserBehavior> out) {
+        switch (orderStatusEnum) {
+            case WAIT_CHECK:
+                UserBehavior userPayBehavior = new UserBehavior();
+                userPayBehavior.setSourceId(after.getLong("id"));
+                userPayBehavior.setTenantId(after.getInteger("tenant_id"));
+                userPayBehavior.setAreaId(after.getInteger("area_id"));
+                userPayBehavior.setMemberId(after.getLong("member_id"));
+                Date payTime = after.getDate("pay_time");
+                if (payTime == null) {
+                    return;
+                }
+                userPayBehavior.setEventTime(payTime.toInstant());
+                userPayBehavior.setBehaviorType(UserBehaviorEnum.PAY.getType());
+                userPayBehavior.setBehaviorName(UserBehaviorEnum.PAY.getName());
+                out.collect(userPayBehavior);
+                break;
+            case ALREADY_CHECK:
+                UserBehavior userUseBehavior = new UserBehavior();
+                userUseBehavior.setSourceId(after.getLong("id"));
+                userUseBehavior.setTenantId(after.getInteger("tenant_id"));
+                userUseBehavior.setAreaId(after.getInteger("area_id"));
+                userUseBehavior.setMemberId(after.getLong("member_id"));
+                Date updateTime = after.getDate("update_time");
+                if (updateTime == null) {
+                    return;
+                }
+                userUseBehavior.setEventTime(updateTime.toInstant());
+                userUseBehavior.setBehaviorType(UserBehaviorEnum.USE.getType());
+                userUseBehavior.setBehaviorName(UserBehaviorEnum.USE.getName());
+                out.collect(userUseBehavior);
+                break;
+            default:
+                throw new RuntimeException("非法订单状态");
+        }
     }
 
     @Override

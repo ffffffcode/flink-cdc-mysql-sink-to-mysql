@@ -42,7 +42,7 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
             env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order MySQL Binlog Source")
                     .setParallelism(1)
                     .addSink(JdbcSink.sink(
-                            "INSERT INTO analyse.user_behavior_flink_cdc (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO statistics_user_behavior (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
                             (ps, t) -> {
                                 ps.setInt(1, t.getTenantId());
                                 ps.setInt(2, t.getAreaId());
@@ -53,12 +53,12 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
                                 ps.setLong(7, t.getSourceId());
                             },
                             new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
-                                    .withUrl("jdbc:clickhouse://10.0.10.13:25202/analyse?useUnicode=true&characterEncoding=UTF-8&useSSL=false&use_time_zone=UTC+8&use_server_time_zone=UTC+8")
+                                    .withUrl("jdbc:clickhouse://10.0.10.13:25202/dim?useUnicode=true&characterEncoding=UTF-8&useSSL=false&use_time_zone=UTC+8&use_server_time_zone=UTC+8")
                                     .withUsername("default")
                                     .withPassword("")
                                     .withDriverName("cc.blynk.clickhouse.ClickHouseDriver")
                                     .build()))
-                    .name("user_behavior_flink_cdc ClickHouse Sink")
+                    .name("statistics_user_behavior ClickHouse Sink")
                     .setParallelism(1);
 
             env.execute("Order Binlog To UserBehavior Job");
