@@ -3,6 +3,10 @@ package com.boom.stream.demo.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * @author aaron
+ * @version 1.0
+ */
 @AllArgsConstructor
 @Getter
 public enum RefundStatusEnum {

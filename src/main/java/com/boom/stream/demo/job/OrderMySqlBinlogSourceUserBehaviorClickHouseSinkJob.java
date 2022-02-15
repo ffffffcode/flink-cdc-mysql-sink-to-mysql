@@ -27,8 +27,8 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
             MySqlSource<UserBehavior> mySqlSource = MySqlSource.<UserBehavior>builder()
                     .hostname("10.0.10.13")
                     .port(23100)
-                    .databaseList("mall_order")
-                    .tableList("mall_order.order")
+                    .databaseList("mall_order", "member")
+                    .tableList("mall_order.order", "member.my_collect")
                     .username("root")
                     .password("a123456")
                     .debeziumProperties(debeziumProperties)
@@ -39,13 +39,17 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
 
             env.enableCheckpointing(3000L);
 
-            env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order MySQL Binlog Source")
+            env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order/my_collect MySQL Binlog Source")
                     .setParallelism(1)
                     .addSink(JdbcSink.sink(
                             "INSERT INTO statistics_user_behavior (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
                             (ps, t) -> {
                                 ps.setInt(1, t.getTenantId());
-                                ps.setInt(2, t.getAreaId());
+                                Integer areaId = t.getAreaId();
+                                if (areaId == null) {
+                                    areaId = -1;
+                                }
+                                ps.setInt(2, areaId);
                                 ps.setLong(3, t.getMemberId());
                                 ps.setString(4, t.getEventTime().atZone(ZoneId.of("+8")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                                 ps.setInt(5, t.getBehaviorType());
@@ -61,7 +65,7 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
                     .name("statistics_user_behavior ClickHouse Sink")
                     .setParallelism(1);
 
-            env.execute("Order Binlog To UserBehavior Job");
+            env.execute("UserBehavior Job");
         }catch (Exception e) {
             throw e;
         }

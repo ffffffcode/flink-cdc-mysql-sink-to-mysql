@@ -17,8 +17,11 @@ public enum UserBehaviorEnum {
     USE(3, "核销"),
     REFUND(4, "退款"),
     PARTICIPATE_IN_MARKETING_ACTIVITIES(5, "参与营销活动"),
-    COLLECT(6, "收藏"),
-    COMMENT(7, "评论");
+    COLLECT_PRODUCT(6, "收藏商品"),
+    UN_COLLECT_PRODUCT(7, "取消收藏商品"),
+    COLLECT_STORE(8, "收藏门店"),
+    UN_COLLECT_STORE(9, "取消收藏门店"),
+    COMMENT(10, "评论");
 
 
     private final Integer type;
