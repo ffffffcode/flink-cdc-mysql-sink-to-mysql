@@ -46,12 +46,37 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
 
             if ("mysql_binlog_source.member.my_collect".equals(record.topic())) {
                 dealMyCollectSource(binlog, out);
+                return;
+            }
+
+            if ("mysql_binlog_source.mall_merchant.overlord_meal_participate_record".equals(record.topic())) {
+                dealOverlordMealSource(binlog, out);
             }
 
         } catch (Exception e) {
             throw e;
         }
 
+    }
+
+    private void dealOverlordMealSource(JSONObject binlog, Collector<UserBehavior> out) {
+        JSONObject after = binlog.getJSONObject("after");
+
+        if ("r".equals(binlog.getString("op")) || "c".equals(binlog.getString("op"))) {
+            UserBehavior userBehavior = new UserBehavior();
+            userBehavior.setSourceId(after.getString("id"));
+            userBehavior.setTenantId(after.getInteger("tenant_id"));
+            userBehavior.setAreaId(after.getInteger("area_id"));
+            userBehavior.setMemberId(after.getLong("member_id"));
+            Date createTime = after.getDate("create_time");
+            if (createTime == null) {
+                return;
+            }
+            userBehavior.setEventTime(createTime.toInstant());
+            userBehavior.setBehaviorType(UserBehaviorEnum.PARTICIPATE_IN_OVERLORD_MEAL.getType());
+            userBehavior.setBehaviorName(UserBehaviorEnum.PARTICIPATE_IN_OVERLORD_MEAL.getName());
+            out.collect(userBehavior);
+        }
     }
 
     private void dealMyCollectSource(JSONObject binlog, Collector<UserBehavior> out) {

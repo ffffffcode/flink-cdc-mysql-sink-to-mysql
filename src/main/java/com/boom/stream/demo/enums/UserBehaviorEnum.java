@@ -16,7 +16,7 @@ public enum UserBehaviorEnum {
     PAY(2, "支付"),
     USE(3, "核销"),
     REFUND(4, "退款"),
-    PARTICIPATE_IN_MARKETING_ACTIVITIES(5, "参与营销活动"),
+    PARTICIPATE_IN_OVERLORD_MEAL(5, "参与霸王餐"),
     COLLECT_PRODUCT(6, "收藏商品"),
     UN_COLLECT_PRODUCT(7, "取消收藏商品"),
     COLLECT_STORE(8, "收藏门店"),

@@ -28,8 +28,8 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
             MySqlSource<UserBehavior> mySqlSource = MySqlSource.<UserBehavior>builder()
                     .hostname("10.0.10.13")
                     .port(23100)
-                    .databaseList("mall_order", "member")
-                    .tableList("mall_order.order", "member.my_collect")
+                    .databaseList("mall_order", "member", "mall_merchant")
+                    .tableList("mall_order.order", "member.my_collect", "mall_merchant.overlord_meal_participate_record")
                     .username("root")
                     .password("a123456")
                     .debeziumProperties(debeziumProperties)
@@ -40,7 +40,7 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
 
             env.enableCheckpointing(3000L);
 
-            env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order/my_collect MySQL Binlog Source")
+            env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order/my_collect/overlord_meal MySQL Binlog Source")
                     .setParallelism(1)
                     .addSink(JdbcSink.sink(
                             "INSERT INTO statistics_user_behavior (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -71,7 +71,7 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
                     .name("statistics_user_behavior ClickHouse Sink")
                     .setParallelism(1);
 
-            env.execute("UserBehavior Job(Order, Collect)");
+            env.execute("UserBehavior Job(Order, Collect, OverlordMeal)");
         } catch (Exception e) {
             throw e;
         }
