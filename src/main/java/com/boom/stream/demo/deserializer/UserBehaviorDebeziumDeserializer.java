@@ -66,13 +66,13 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                 if (DeleteStatusEnum.DELETED.getCode().equals(after.getInteger("delete_status"))) {
                     // 记录收藏和取消收藏
                     UserBehavior userCollectBehavior = new UserBehavior();
-                    userCollectBehavior.setSourceId(after.getLong("id"));
+                    userCollectBehavior.setSourceId(after.getString("id"));
                     userCollectBehavior.setTenantId(after.getInteger("tenant_id"));
                     userCollectBehavior.setAreaId(after.getInteger("area_id"));
                     userCollectBehavior.setMemberId(after.getLong("member_id"));
                     userCollectBehavior.setEventTime(after.getDate("create_time").toInstant());
                     UserBehavior userUnCollectBehavior = new UserBehavior();
-                    userUnCollectBehavior.setSourceId(after.getLong("id"));
+                    userUnCollectBehavior.setSourceId(after.getString("id"));
                     userUnCollectBehavior.setTenantId(after.getInteger("tenant_id"));
                     userUnCollectBehavior.setAreaId(after.getInteger("area_id"));
                     userUnCollectBehavior.setMemberId(after.getLong("member_id"));
@@ -102,7 +102,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                 if (DeleteStatusEnum.NOT_DELETED.getCode().equals(after.getInteger("delete_status"))) {
                     // 记录收藏
                     UserBehavior userCollectBehavior = new UserBehavior();
-                    userCollectBehavior.setSourceId(after.getLong("id"));
+                    userCollectBehavior.setSourceId(after.getString("id"));
                     userCollectBehavior.setTenantId(after.getInteger("tenant_id"));
                     userCollectBehavior.setAreaId(after.getInteger("area_id"));
                     userCollectBehavior.setMemberId(after.getLong("member_id"));
@@ -126,7 +126,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
 
             if ("c".equals(binlog.getString("op"))) {
                 UserBehavior userCollectBehavior = new UserBehavior();
-                userCollectBehavior.setSourceId(after.getLong("id"));
+                userCollectBehavior.setSourceId(after.getString("id"));
                 userCollectBehavior.setTenantId(after.getInteger("tenant_id"));
                 userCollectBehavior.setAreaId(after.getInteger("area_id"));
                 userCollectBehavior.setMemberId(after.getLong("member_id"));
@@ -156,7 +156,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                 }
 
                 UserBehavior userUnCollectBehavior = new UserBehavior();
-                userUnCollectBehavior.setSourceId(after.getLong("id"));
+                userUnCollectBehavior.setSourceId(after.getString("id"));
                 userUnCollectBehavior.setTenantId(after.getInteger("tenant_id"));
                 userUnCollectBehavior.setAreaId(after.getInteger("area_id"));
                 userUnCollectBehavior.setMemberId(after.getLong("member_id"));
@@ -190,7 +190,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
             }
 
             UserBehavior userOrderBehavior = new UserBehavior();
-            userOrderBehavior.setSourceId(after.getLong("id"));
+            userOrderBehavior.setSourceId(after.getString("id"));
             userOrderBehavior.setTenantId(after.getInteger("tenant_id"));
             userOrderBehavior.setAreaId(after.getInteger("area_id"));
             userOrderBehavior.setMemberId(after.getLong("member_id"));
@@ -199,7 +199,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
             userOrderBehavior.setBehaviorName(UserBehaviorEnum.ORDER.getName());
 
             UserBehavior userPayBehavior = new UserBehavior();
-            userPayBehavior.setSourceId(after.getLong("id"));
+            userPayBehavior.setSourceId(after.getString("id"));
             userPayBehavior.setTenantId(after.getInteger("tenant_id"));
             userPayBehavior.setAreaId(after.getInteger("area_id"));
             userPayBehavior.setMemberId(after.getLong("member_id"));
@@ -207,7 +207,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
             userPayBehavior.setBehaviorName(UserBehaviorEnum.PAY.getName());
 
             UserBehavior userUseBehavior = new UserBehavior();
-            userUseBehavior.setSourceId(after.getLong("id"));
+            userUseBehavior.setSourceId(after.getString("id"));
             userUseBehavior.setTenantId(after.getInteger("tenant_id"));
             userUseBehavior.setAreaId(after.getInteger("area_id"));
             userUseBehavior.setMemberId(after.getLong("member_id"));
@@ -266,7 +266,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
 
             if (!refundStatusEnum.equals(RefundStatusEnum.NOT_ALL_REFUNDED)) {
                 UserBehavior userRefundBehavior = new UserBehavior();
-                userRefundBehavior.setSourceId(after.getLong("id"));
+                userRefundBehavior.setSourceId(after.getString("id"));
                 userRefundBehavior.setTenantId(after.getInteger("tenant_id"));
                 userRefundBehavior.setAreaId(after.getInteger("area_id"));
                 userRefundBehavior.setMemberId(after.getLong("member_id"));
@@ -284,7 +284,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
 
         if ("c".equals(binlog.getString("op"))) {
             UserBehavior userOrderBehavior = new UserBehavior();
-            userOrderBehavior.setSourceId(after.getLong("id"));
+            userOrderBehavior.setSourceId(after.getString("id"));
             userOrderBehavior.setTenantId(after.getInteger("tenant_id"));
             userOrderBehavior.setAreaId(after.getInteger("area_id"));
             userOrderBehavior.setMemberId(after.getLong("member_id"));
@@ -322,7 +322,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
     private void recordRefund(RefundStatusEnum refundStatusEnum, JSONObject after, Collector<UserBehavior> out) {
         if (refundStatusEnum.equals(RefundStatusEnum.ALL_APPLY_REFUND)) {
             UserBehavior userPayBehavior = new UserBehavior();
-            userPayBehavior.setSourceId(after.getLong("id"));
+            userPayBehavior.setSourceId(after.getString("id"));
             userPayBehavior.setTenantId(after.getInteger("tenant_id"));
             userPayBehavior.setAreaId(after.getInteger("area_id"));
             userPayBehavior.setMemberId(after.getLong("member_id"));
@@ -341,7 +341,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
         switch (orderStatusEnum) {
             case WAIT_CHECK:
                 UserBehavior userPayBehavior = new UserBehavior();
-                userPayBehavior.setSourceId(after.getLong("id"));
+                userPayBehavior.setSourceId(after.getString("id"));
                 userPayBehavior.setTenantId(after.getInteger("tenant_id"));
                 userPayBehavior.setAreaId(after.getInteger("area_id"));
                 userPayBehavior.setMemberId(after.getLong("member_id"));
@@ -356,7 +356,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                 break;
             case ALREADY_CHECK:
                 UserBehavior userUseBehavior = new UserBehavior();
-                userUseBehavior.setSourceId(after.getLong("id"));
+                userUseBehavior.setSourceId(after.getString("id"));
                 userUseBehavior.setTenantId(after.getInteger("tenant_id"));
                 userUseBehavior.setAreaId(after.getInteger("area_id"));
                 userUseBehavior.setMemberId(after.getLong("member_id"));

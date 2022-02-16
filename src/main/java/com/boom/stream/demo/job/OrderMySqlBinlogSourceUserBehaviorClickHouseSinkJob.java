@@ -5,6 +5,7 @@ import com.boom.stream.demo.entity.UserBehavior;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
+import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
 import org.apache.flink.connector.jdbc.JdbcSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -54,8 +55,13 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
                                 ps.setString(4, t.getEventTime().atZone(ZoneId.of("+8")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                                 ps.setInt(5, t.getBehaviorType());
                                 ps.setString(6, t.getBehaviorName());
-                                ps.setLong(7, t.getSourceId());
+                                ps.setString(7, t.getSourceId());
                             },
+                            JdbcExecutionOptions.builder()
+                                    .withBatchSize(1000)
+                                    .withBatchIntervalMs(200)
+                                    .withMaxRetries(5)
+                                    .build(),
                             new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
                                     .withUrl("jdbc:clickhouse://10.0.10.13:25202/dim?useUnicode=true&characterEncoding=UTF-8&useSSL=false&use_time_zone=UTC+8&use_server_time_zone=UTC+8")
                                     .withUsername("default")
@@ -65,8 +71,8 @@ public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
                     .name("statistics_user_behavior ClickHouse Sink")
                     .setParallelism(1);
 
-            env.execute("UserBehavior Job");
-        }catch (Exception e) {
+            env.execute("UserBehavior Job(Order, Collect)");
+        } catch (Exception e) {
             throw e;
         }
     }
