@@ -1,8 +1,8 @@
-package com.boom.stream.demo.deserializer;
+package com.boom.stream.userbehavior.deserializer;
 
 import com.alibaba.fastjson.JSONObject;
-import com.boom.stream.demo.entity.UserBehavior;
-import com.boom.stream.demo.enums.*;
+import com.boom.stream.userbehavior.entity.UserBehavior;
+import com.boom.stream.userbehavior.enums.*;
 import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;

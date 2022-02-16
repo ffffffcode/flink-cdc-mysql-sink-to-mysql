@@ -16,7 +16,7 @@
         <fastjson.version>1.2.75</fastjson.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <main.class>com.boom.stream.demo.job.MySqlBinlogSourceUserBehaviorClickHouseSinkJob</main.class>
+        <main.class>com.boom.stream.userbehavior.job.MySqlBinlogSourceUserBehaviorClickHouseSinkJob</main.class>
     </properties>
 
     <dependencies>

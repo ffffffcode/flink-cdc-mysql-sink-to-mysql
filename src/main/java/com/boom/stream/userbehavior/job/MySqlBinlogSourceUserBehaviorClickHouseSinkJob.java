@@ -1,7 +1,7 @@
-package com.boom.stream.demo.job;
+package com.boom.stream.userbehavior.job;
 
-import com.boom.stream.demo.deserializer.UserBehaviorDebeziumDeserializer;
-import com.boom.stream.demo.entity.UserBehavior;
+import com.boom.stream.userbehavior.deserializer.UserBehaviorDebeziumDeserializer;
+import com.boom.stream.userbehavior.entity.UserBehavior;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;

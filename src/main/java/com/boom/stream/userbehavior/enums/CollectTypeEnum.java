@@ -1,4 +1,4 @@
-package com.boom.stream.demo.enums;
+package com.boom.stream.userbehavior.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

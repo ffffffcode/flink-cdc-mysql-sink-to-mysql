@@ -1,7 +1,7 @@
-package com.boom.stream.demo.job;
+package com.boom.stream.userbehavior.job;
 
-import com.boom.stream.demo.deserializer.UserReviewBehaviorDebeziumDeserializer;
-import com.boom.stream.demo.entity.UserBehavior;
+import com.boom.stream.userbehavior.deserializer.UserReviewBehaviorDebeziumDeserializer;
+import com.boom.stream.userbehavior.entity.UserBehavior;
 import com.ververica.cdc.connectors.mongodb.MongoDBSource;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcExecutionOptions;

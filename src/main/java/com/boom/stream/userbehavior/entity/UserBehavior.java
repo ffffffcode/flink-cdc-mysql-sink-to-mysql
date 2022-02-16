@@ -1,4 +1,4 @@
-package com.boom.stream.demo.entity;
+package com.boom.stream.userbehavior.entity;
 
 import lombok.Data;
 
