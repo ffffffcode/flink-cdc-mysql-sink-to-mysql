@@ -18,7 +18,7 @@ import java.util.Properties;
  * @version 1.0
  * @date 2022/1/27 10:41
  */
-public class OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob {
+public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
 
     public static void main(String[] args) throws Exception {
         try {

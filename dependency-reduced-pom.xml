@@ -154,7 +154,7 @@
   </dependencies>
   <properties>
     <clickhouse4j.version>1.4.4</clickhouse4j.version>
-    <main.class>com.boom.stream.demo.job.OrderMySqlBinlogSourceUserBehaviorClickHouseSinkJob</main.class>
+    <main.class>com.boom.stream.demo.job.MySqlBinlogSourceUserBehaviorClickHouseSinkJob</main.class>
     <jackson.version>2.11.1</jackson.version>
     <flink.cdc.version>2.1.1</flink.cdc.version>
     <flink.version>1.13.5</flink.version>
