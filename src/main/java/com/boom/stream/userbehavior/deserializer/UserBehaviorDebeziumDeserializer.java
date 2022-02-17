@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.boom.stream.userbehavior.entity.UserBehavior;
 import com.boom.stream.userbehavior.enums.*;
 import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.util.Collector;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Optional;
 
+@Slf4j
 public class UserBehaviorDebeziumDeserializer implements DebeziumDeserializationSchema<UserBehavior> {
 
     private static final long serialVersionUID = 1L;
@@ -84,10 +86,11 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
             ApplyRefundTypeEnum applyRefundTypeEnum = ApplyRefundTypeEnum.getEnumByCode(applyRefundType);
             OrderRefundVerifyStatusEnum orderRefundVerifyStatusEnum = OrderRefundVerifyStatusEnum.getEnumByCode(verifyStatus);
 
-            // 审核通过 且 不是第三方处理失败自动退款 且 不是OpenAPI的订单
+            // 审核通过 且 不是第三方处理失败自动退款 且 退款成功的订单
+            Date realityRefundTime = after.getDate("reality_refund_time");
             boolean dealCondition = OrderRefundVerifyStatusEnum.PASS.equals(orderRefundVerifyStatusEnum)
                     && !ApplyRefundTypeEnum.THIRD_PART_FAIL.equals(applyRefundTypeEnum)
-                    && !ApplyRefundTypeEnum.OPENAPI.equals(applyRefundTypeEnum);
+                    && realityRefundTime != null;
 
             if (dealCondition) {
                 UserBehavior userRefundBehavior = new UserBehavior();
@@ -97,10 +100,6 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                 userRefundBehavior.setMemberId(after.getLong("member_id"));
                 userRefundBehavior.setBehaviorType(UserBehaviorEnum.REFUND.getType());
                 userRefundBehavior.setBehaviorName(UserBehaviorEnum.REFUND.getName());
-                Date realityRefundTime = after.getDate("reality_refund_time");
-                if (realityRefundTime == null) {
-                    return;
-                }
                 userRefundBehavior.setEventTime(realityRefundTime.toInstant());
                 out.collect(userRefundBehavior);
             }
@@ -281,7 +280,8 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
             Integer orderStatus = after.getInteger("order_status");
             OrderStatusEnum orderStatusEnum = OrderStatusEnum.getEnumByCode(orderStatus);
             if (orderStatusEnum == null) {
-                throw new RuntimeException("订单转换为行为记录失败，订单状态（order_status）错误，binlog：" + binlog);
+                log.warn("订单转换为行为记录失败，订单状态（order_status）错误，binlog：" + binlog);
+                return;
             }
 
             UserBehavior userOrderBehavior = new UserBehavior();
@@ -330,7 +330,6 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                     out.collect(userOrderBehavior);
                     break;
                 default:
-                    throw new RuntimeException("订单转换为行为记录失败，binlog：" + binlog);
             }
             return;
         }

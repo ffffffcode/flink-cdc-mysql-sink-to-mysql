@@ -23,4 +23,6 @@ public class UserBehavior {
 
     private Integer tenantId;
     private Integer areaId;
+
+    private Instant createTime;
 }

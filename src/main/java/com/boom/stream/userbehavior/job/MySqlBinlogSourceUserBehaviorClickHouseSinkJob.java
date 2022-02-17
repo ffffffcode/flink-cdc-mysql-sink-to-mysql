@@ -29,7 +29,6 @@ public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
                     .hostname("10.0.10.13")
                     .port(23100)
                     .databaseList("mall_order", "member", "mall_merchant")
-                    // TODO order order_check_code 过滤OpenApi数据
                     .tableList("mall_order.order", "mall_order.order_check_code", "mall_order.order_refund", "member.my_collect", "mall_merchant.overlord_meal_participate_record")
                     .username("root")
                     .password("a123456")
