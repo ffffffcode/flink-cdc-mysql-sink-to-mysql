@@ -17,9 +17,9 @@ public enum DeleteStatusEnum {
     NOT_DELETED(0, "未删除"),
     DELETED(1, "已删除");
 
-    private Integer code;
+    private final Integer code;
 
-    private String msg;
+    private final String msg;
 
     public static Optional<DeleteStatusEnum> of(Integer code) {
         return Arrays.stream(DeleteStatusEnum.values()).filter(item -> item.getCode().equals(code)).findFirst();

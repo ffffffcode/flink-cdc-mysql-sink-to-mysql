@@ -29,7 +29,8 @@ public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
                     .hostname("10.0.10.13")
                     .port(23100)
                     .databaseList("mall_order", "member", "mall_merchant")
-                    .tableList("mall_order.order", "member.my_collect", "mall_merchant.overlord_meal_participate_record")
+                    // TODO order order_check_code 过滤OpenApi数据
+                    .tableList("mall_order.order", "mall_order.order_check_code", "mall_order.order_refund", "member.my_collect", "mall_merchant.overlord_meal_participate_record")
                     .username("root")
                     .password("a123456")
                     .debeziumProperties(debeziumProperties)
@@ -40,7 +41,7 @@ public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
 
             env.enableCheckpointing(3000L);
 
-            env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order/my_collect/overlord_meal MySQL Binlog Source")
+            env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order/order_check_code/order_refund/my_collect/overlord_meal MySQL Binlog Source")
                     .setParallelism(1)
                     .addSink(JdbcSink.sink(
                             "INSERT INTO statistics_user_behavior (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id, actual_pay_money) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
@@ -72,7 +73,7 @@ public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
                     .name("statistics_user_behavior ClickHouse Sink")
                     .setParallelism(1);
 
-            env.execute("UserBehavior Job(Order, Collect, OverlordMeal)");
+            env.execute("UserBehavior Job(Order, Use, Refund, Collect, OverlordMeal)");
         } catch (Exception e) {
             throw e;
         }

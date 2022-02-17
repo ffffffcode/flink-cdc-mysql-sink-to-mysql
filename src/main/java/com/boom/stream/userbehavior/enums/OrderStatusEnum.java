@@ -17,9 +17,8 @@ public enum OrderStatusEnum {
     EXPIRED(3, "已过期"),
     CLOSED(4, "已关闭");
 
-    private Integer code;
-
-    private String msg;
+    private final Integer code;
+    private final String msg;
 
     public static OrderStatusEnum getEnumByCode(Integer code) {
         OrderStatusEnum[] items = values();
