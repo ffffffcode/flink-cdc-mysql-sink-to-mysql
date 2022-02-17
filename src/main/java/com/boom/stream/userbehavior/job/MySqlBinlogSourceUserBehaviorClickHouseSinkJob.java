@@ -3,6 +3,7 @@ package com.boom.stream.userbehavior.job;
 import com.boom.stream.userbehavior.deserializer.UserBehaviorDebeziumDeserializer;
 import com.boom.stream.userbehavior.entity.UserBehavior;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
@@ -18,9 +19,10 @@ import java.util.Properties;
  * @version 1.0
  * @date 2022/1/27 10:41
  */
+@Slf4j
 public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         try {
             Properties debeziumProperties = new Properties();
 //        debeziumProperties.put("debezium.snapshot.locking.mode", "none");
@@ -74,7 +76,7 @@ public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
 
             env.execute("UserBehavior Job(Order, Use, Refund, Collect, OverlordMeal)");
         } catch (Exception e) {
-            throw e;
+            e.printStackTrace();
         }
     }
 

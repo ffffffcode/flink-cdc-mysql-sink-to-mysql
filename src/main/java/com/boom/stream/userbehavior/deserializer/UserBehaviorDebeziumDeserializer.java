@@ -28,7 +28,6 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
 
     @Override
     public void deserialize(SourceRecord record, Collector<UserBehavior> out) {
-
         try {
             if (jsonConverter == null) {
                 jsonConverter = new JsonConverter();
@@ -70,11 +69,9 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
             if ("mysql_binlog_source.mall_merchant.overlord_meal_participate_record".equals(record.topic())) {
                 dealOverlordMealSource(binlog, out);
             }
-
         } catch (Exception e) {
-            throw e;
+            e.printStackTrace();
         }
-
     }
 
     private void dealOrderRefundSource(JSONObject binlog, Collector<UserBehavior> out) {
