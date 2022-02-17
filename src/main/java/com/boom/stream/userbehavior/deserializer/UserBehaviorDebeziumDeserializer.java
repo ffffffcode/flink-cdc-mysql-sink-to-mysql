@@ -13,6 +13,7 @@ import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.storage.ConverterConfig;
 import org.apache.kafka.connect.storage.ConverterType;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Optional;
@@ -240,6 +241,7 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
             userUseBehavior.setBehaviorName(UserBehaviorEnum.USE.getName());
 
             Date payTime = after.getDate("pay_time");
+            BigDecimal actualPayMoney = after.getBigDecimal("actual_pay_money");
             Date updateTime = after.getDate("update_time");
 
             switch (orderStatusEnum) {
@@ -248,18 +250,20 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                     break;
                 case WAIT_CHECK:
                     out.collect(userOrderBehavior);
-                    if (payTime == null) {
+                    if (payTime == null || actualPayMoney == null) {
                         break;
                     }
                     userPayBehavior.setEventTime(payTime.toInstant());
+                    userPayBehavior.setActualPayMoney(actualPayMoney);
                     out.collect(userPayBehavior);
                     break;
                 case ALREADY_CHECK:
                     out.collect(userOrderBehavior);
-                    if (payTime == null) {
+                    if (payTime == null || actualPayMoney == null) {
                         break;
                     }
                     userPayBehavior.setEventTime(payTime.toInstant());
+                    userPayBehavior.setActualPayMoney(actualPayMoney);
                     out.collect(userPayBehavior);
                     if (updateTime == null) {
                         break;
@@ -269,10 +273,11 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                     break;
                 case EXPIRED:
                     out.collect(userOrderBehavior);
-                    if (payTime == null) {
+                    if (payTime == null || actualPayMoney == null) {
                         break;
                     }
                     userPayBehavior.setEventTime(payTime.toInstant());
+                    userPayBehavior.setActualPayMoney(actualPayMoney);
                     out.collect(userPayBehavior);
                     break;
                 case CLOSED:
@@ -371,10 +376,12 @@ public class UserBehaviorDebeziumDeserializer implements DebeziumDeserialization
                 userPayBehavior.setAreaId(after.getInteger("area_id"));
                 userPayBehavior.setMemberId(after.getLong("member_id"));
                 Date payTime = after.getDate("pay_time");
-                if (payTime == null) {
+                BigDecimal actualPayMoney = after.getBigDecimal("actual_pay_money");
+                if (payTime == null || actualPayMoney == null) {
                     return;
                 }
                 userPayBehavior.setEventTime(payTime.toInstant());
+                userPayBehavior.setActualPayMoney(actualPayMoney);
                 userPayBehavior.setBehaviorType(UserBehaviorEnum.PAY.getType());
                 userPayBehavior.setBehaviorName(UserBehaviorEnum.PAY.getName());
                 out.collect(userPayBehavior);

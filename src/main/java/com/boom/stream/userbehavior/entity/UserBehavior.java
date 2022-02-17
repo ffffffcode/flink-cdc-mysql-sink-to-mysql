@@ -2,6 +2,7 @@ package com.boom.stream.userbehavior.entity;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
@@ -18,6 +19,7 @@ public class UserBehavior {
     private Instant eventTime;
     private Integer behaviorType;
     private String behaviorName;
+    private BigDecimal actualPayMoney;
 
     private Integer tenantId;
     private Integer areaId;

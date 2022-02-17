@@ -43,7 +43,7 @@ public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
             env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order/my_collect/overlord_meal MySQL Binlog Source")
                     .setParallelism(1)
                     .addSink(JdbcSink.sink(
-                            "INSERT INTO statistics_user_behavior (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO statistics_user_behavior (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id, actual_pay_money) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                             (ps, t) -> {
                                 ps.setInt(1, t.getTenantId());
                                 Integer areaId = t.getAreaId();
@@ -56,6 +56,7 @@ public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
                                 ps.setInt(5, t.getBehaviorType());
                                 ps.setString(6, t.getBehaviorName());
                                 ps.setString(7, t.getSourceId());
+                                ps.setBigDecimal(8, t.getActualPayMoney());
                             },
                             JdbcExecutionOptions.builder()
                                     .withBatchSize(1000)
