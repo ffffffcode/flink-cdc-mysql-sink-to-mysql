@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="logImpl" value="SLF4J"/>
+    </settings>
+    <environments default="dev">
+        <environment id="dev">
+            <transactionManager type="JDBC"/>
+            <dataSource type="com.boom.stream.usergroup.config.HikariDataSourceFactory"/>
+        </environment>
+    </environments>
+    <!--Mapper映射-->
+    <mappers>
+        <mapper resource="mapper/UserGroupMapper.xml"/>
+    </mappers>
+</configuration>

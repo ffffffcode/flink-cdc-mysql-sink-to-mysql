@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.boom.stream.usergroup.db.mapper.UserGroupMapper">
+    <select id="exist" resultType="java.lang.Long">
+        SELECT DISTINCT member_id
+        FROM statistics_user_behavior
+        <where>
+            <choose>
+                <when test="target != null and target == 0">
+                    behavior_type = 1
+                </when>
+                <when test="target != null and target == 1">
+                    behavior_type = 2
+                </when>
+                <when test="target != null and target == 2">
+                    behavior_type = 3
+                </when>
+                <when test="target != null and target == 3">
+                    behavior_type = 4
+                </when>
+                <when test="target != null and target == 6">
+                    behavior_type = 5
+                </when>
+                <when test="target != null and target == 8">
+                    behavior_type = 10
+                </when>
+            </choose>
+            <if test="time != null">
+                AND event_time &gt;= #{time}
+            </if>
+        </where>
+        <if test="havingSql != null and havingSql != ''">
+            GROUP BY member_id
+            HAVING
+            ${havingSql}
+        </if>
+    </select>
+
+    <select id="notExist" resultType="java.lang.Long">
+        SELECT DISTINCT id FROM mysql_data_sync.member WHERE delete_status = 0 AND flag = 0 AND id NOT IN (
+        SELECT DISTINCT member_id
+        FROM statistics_user_behavior
+        <where>
+            <choose>
+                <when test="target != null and target == 0">
+                    behavior_type = 1
+                </when>
+                <when test="target != null and target == 1">
+                    behavior_type = 2
+                </when>
+                <when test="target != null and target == 2">
+                    behavior_type = 3
+                </when>
+                <when test="target != null and target == 3">
+                    behavior_type = 4
+                </when>
+                <when test="target != null and target == 6">
+                    behavior_type = 5
+                </when>
+                <when test="target != null and target == 8">
+                    behavior_type = 10
+                </when>
+            </choose>
+            <if test="time != null">
+                AND event_time &gt;= #{time}
+            </if>
+        </where>
+        <if test="havingSql != null and havingSql != ''">
+            GROUP BY member_id
+            HAVING
+            ${havingSql}
+        </if>
+        )
+    </select>
+</mapper>
+
+        <!--VISIT(4, "visit_count", "访问行为"),
+        SHARE(5, "share_count", "分享行为"),
+        COLLECT(7, "collect_count", "收藏行为"),
+
+
+        COLLECT_PRODUCT(6, "收藏商品"),
+        UN_COLLECT_PRODUCT(7, "取消收藏商品"),
+        COLLECT_STORE(8, "收藏门店"),
+        UN_COLLECT_STORE(9, "取消收藏门店"),-->
+
