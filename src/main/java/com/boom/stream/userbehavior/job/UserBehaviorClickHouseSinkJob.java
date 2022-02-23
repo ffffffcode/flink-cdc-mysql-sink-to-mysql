@@ -13,6 +13,7 @@ import org.apache.flink.connector.jdbc.JdbcSink;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.CoMapFunction;
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 
 import java.time.ZoneId;
@@ -25,7 +26,7 @@ import java.util.Properties;
  * @date 2022/1/27 10:41
  */
 @Slf4j
-public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
+public class UserBehaviorClickHouseSinkJob {
 
     public static void main(String[] args) {
         try {
@@ -56,14 +57,10 @@ public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
 
             env.enableCheckpointing(3000L);
 
-            DataStreamSource<UserBehavior> reviewMongodbOplogSource = env.addSource(mongoSource, "review MongoDB Oplog Source")
-                    .setParallelism(1);
+            DataStreamSource<UserBehavior> reviewMongodbOplogSource = env.addSource(mongoSource, "review MongoDB Oplog Source").setParallelism(1);
 
-
-
-            env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order/order_check_code/order_refund/my_collect/overlord_meal MySQL Binlog Source")
-                    .setParallelism(1)
-                    .connect(reviewMongodbOplogSource).map(new NothingToDoCoMapper())
+            env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order/order_check_code/order_refund/my_collect/overlord_meal MySQL Binlog Source").setParallelism(1)
+                    .connect(reviewMongodbOplogSource).map(new NothingToDoCoMapper()).name("merge")
                     .addSink(JdbcSink.sink(
                             "INSERT INTO statistics_user_behavior (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id, actual_pay_money) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                             (ps, t) -> {
@@ -94,7 +91,7 @@ public class MySqlBinlogSourceUserBehaviorClickHouseSinkJob {
                     .name("statistics_user_behavior ClickHouse Sink")
                     .setParallelism(1);
 
-            env.execute("UserBehavior Job(Order, Use, Refund, Collect, OverlordMeal)");
+            env.execute("UserBehavior Job(Order, Use, Refund, Collect, OverlordMeal, Review)");
         } catch (Exception e) {
             e.printStackTrace();
         }

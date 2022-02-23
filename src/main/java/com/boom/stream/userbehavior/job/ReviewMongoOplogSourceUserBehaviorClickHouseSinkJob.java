@@ -16,7 +16,10 @@ import java.time.format.DateTimeFormatter;
  * @author aaron
  * @version 1.0
  * @date 2022/2/15 17:10
+ *
+ * 弃用，合并到 @see com.boom.stream.userbehavior.job.UserBehaviorClickHouseSinkJob
  */
+@Deprecated()
 public class ReviewMongoOplogSourceUserBehaviorClickHouseSinkJob {
 
     public static void main(String[] args) throws Exception {

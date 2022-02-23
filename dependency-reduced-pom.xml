@@ -170,7 +170,7 @@
     <logback.version>1.2.10</logback.version>
     <jackson.version>2.11.1</jackson.version>
     <flink.cdc.version>2.1.1</flink.cdc.version>
-    <main.class>com.boom.stream.usergroup.job.UserGroupClickHouseJob</main.class>
+    <main.class>com.boom.stream.userbehavior.job.UserBehaviorClickHouseSinkJob</main.class>
     <maven.compiler.source>8</maven.compiler.source>
     <fastjson.version>1.2.75</fastjson.version>
   </properties>
