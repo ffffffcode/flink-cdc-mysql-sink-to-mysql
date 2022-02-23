@@ -65,10 +65,6 @@
           <artifactId>commons-math3</artifactId>
           <groupId>org.apache.commons</groupId>
         </exclusion>
-        <exclusion>
-          <artifactId>jsr305</artifactId>
-          <groupId>com.google.code.findbugs</groupId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -92,10 +88,6 @@
         <exclusion>
           <artifactId>flink-core</artifactId>
           <groupId>org.apache.flink</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jsr305</artifactId>
-          <groupId>com.google.code.findbugs</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -125,10 +117,6 @@
           <artifactId>flink-core</artifactId>
           <groupId>org.apache.flink</groupId>
         </exclusion>
-        <exclusion>
-          <artifactId>jsr305</artifactId>
-          <groupId>com.google.code.findbugs</groupId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -140,10 +128,6 @@
         <exclusion>
           <artifactId>flink-table-api-java</artifactId>
           <groupId>org.apache.flink</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jsr305</artifactId>
-          <groupId>com.google.code.findbugs</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -169,10 +153,6 @@
           <artifactId>flink-runtime_2.12</artifactId>
           <groupId>org.apache.flink</groupId>
         </exclusion>
-        <exclusion>
-          <artifactId>jsr305</artifactId>
-          <groupId>com.google.code.findbugs</groupId>
-        </exclusion>
       </exclusions>
     </dependency>
   </dependencies>
@@ -180,14 +160,16 @@
     <lombok.version>1.18.2</lombok.version>
     <flink.version>1.13.5</flink.version>
     <pulsar-flink-connector.version>1.13.1.2</pulsar-flink-connector.version>
+    <guava.version>31.0.1-jre</guava.version>
+    <lettuce.version>5.3.7.RELEASE</lettuce.version>
     <hikari.version>3.4.5</hikari.version>
     <mybatis-plus.version>3.5.1</mybatis-plus.version>
     <maven.compiler.target>8</maven.compiler.target>
     <scala.binary.version>2.12</scala.binary.version>
     <clickhouse4j.version>1.4.4</clickhouse4j.version>
     <logback.version>1.2.10</logback.version>
-    <flink.cdc.version>2.1.1</flink.cdc.version>
     <jackson.version>2.11.1</jackson.version>
+    <flink.cdc.version>2.1.1</flink.cdc.version>
     <main.class>com.boom.stream.usergroup.job.UserGroupClickHouseJob</main.class>
     <maven.compiler.source>8</maven.compiler.source>
     <fastjson.version>1.2.75</fastjson.version>
