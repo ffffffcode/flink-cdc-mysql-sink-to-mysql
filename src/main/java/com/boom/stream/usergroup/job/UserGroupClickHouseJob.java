@@ -11,6 +11,7 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
+import io.lettuce.core.cluster.RedisClusterClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -152,15 +153,19 @@ public class UserGroupClickHouseJob {
 
     private static class RedisSyncSink extends RichSinkFunction<List<Long>> {
 
-        private RedisCommands<String, String> redisSyncCommands;
+        private RedisClient redisClient;
         private StatefulRedisConnection<String, String> connect;
+        private RedisCommands<String, String> redisSyncCommands;
 
         @Override
         public void open(Configuration parameters) throws Exception {
             RedisURI redisUri = RedisURI.Builder.redis("10.0.10.13", 23200).withPassword("a123456").withDatabase(0).build();
-            RedisClient redisClient = RedisClient.create(redisUri);
+            redisClient = RedisClient.create(redisUri);
             connect = redisClient.connect();
             redisSyncCommands = connect.sync();
+
+            // 集群
+            // RedisClusterClient redisClusterClient = RedisClusterClient.create("");
         }
 
         @Override
@@ -175,6 +180,9 @@ public class UserGroupClickHouseJob {
             }
             if (connect != null) {
                 connect.close();
+            }
+            if (redisClient != null) {
+                redisClient.shutdown();
             }
         }
     }
