@@ -31,6 +31,9 @@ public class UserBehaviorClickHouseSinkJob {
     public static void main(String[] args) {
         try {
             Properties debeziumProperties = new Properties();
+            // todo incremental.snapshot.chunk.size
+            // snapshot.fetch.size
+            // min.row.count.to.stream.results
 //        debeziumProperties.put("debezium.snapshot.locking.mode", "none");
             debeziumProperties.setProperty("decimal.handling.mode", "string");
             MySqlSource<UserBehavior> mySqlSource = MySqlSource.<UserBehavior>builder()
@@ -62,7 +65,7 @@ public class UserBehaviorClickHouseSinkJob {
             env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "order/order_check_code/order_refund/my_collect/overlord_meal MySQL Binlog Source").setParallelism(1)
                     .connect(reviewMongodbOplogSource).map(new NothingToDoCoMapper()).name("merge")
                     .addSink(JdbcSink.sink(
-                            "INSERT INTO statistics_user_behavior (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id, actual_pay_money) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO statistics_user_behavior (tenant_id, area_id, member_id, event_time, behavior_type, behavior_name, source_id, actual_pay_money) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
                             (ps, t) -> {
                                 ps.setInt(1, t.getTenantId());
                                 Integer areaId = t.getAreaId();
